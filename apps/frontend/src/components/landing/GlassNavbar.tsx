@@ -1,0 +1,141 @@
+import { useState } from "react";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { MapPin, ArrowRight } from "lucide-react";
+
+interface GlassNavbarProps {
+  onLaunchPlanner: () => void;
+}
+
+export function GlassNavbar({ onLaunchPlanner }: GlassNavbarProps) {
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 50);
+  });
+
+  return (
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        display: "flex",
+        justifyContent: "center",
+        padding: isScrolled ? "12px 24px" : "24px",
+        transition: "padding var(--transition-md)",
+      }}
+    >
+      <div
+        className="max-w-content"
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 24px",
+          height: isScrolled ? "56px" : "64px",
+          background: isScrolled ? "rgba(10, 10, 12, 0.75)" : "transparent",
+          backdropFilter: isScrolled ? "blur(20px)" : "none",
+          WebkitBackdropFilter: isScrolled ? "blur(20px)" : "none",
+          border: isScrolled ? "1px solid var(--glass-border)" : "1px solid transparent",
+          borderRadius: "999px",
+          transition: "all var(--transition-md)",
+        }}
+      >
+        {/* Logo */}
+        <a
+          href="/"
+          aria-label="Agentic Travel AI home"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            textDecoration: "none",
+            color: "var(--text-primary)",
+          }}
+        >
+          <div
+            style={{
+              width: "32px",
+              height: "32px",
+              borderRadius: "10px",
+              background: "var(--accent)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 12px rgba(124,58,237,0.4)",
+            }}
+          >
+            <MapPin size={16} color="#fff" strokeWidth={2.5} />
+          </div>
+          <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.02em" }}>
+            Agentic Travel
+          </span>
+        </a>
+
+        {/* Center Nav */}
+        <nav style={{ display: "none", gap: "4px" }} className="md:flex">
+          {["Features", "How it Works", "Agents", "Pricing", "Docs"].map((item) => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "999px",
+                fontSize: "14px",
+                fontWeight: 500,
+                color: "var(--text-secondary)",
+                textDecoration: "none",
+                transition: "all var(--transition)",
+              }}
+              onMouseEnter={(e) => {
+                const el = e.target as HTMLAnchorElement;
+                el.style.color = "var(--text-primary)";
+                el.style.background = "var(--glass-bg)";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.target as HTMLAnchorElement;
+                el.style.color = "var(--text-secondary)";
+                el.style.background = "transparent";
+              }}
+            >
+              {item}
+            </a>
+          ))}
+        </nav>
+
+        {/* Right side actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <a
+            href="#signin"
+            style={{
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "var(--text-secondary)",
+              textDecoration: "none",
+              padding: "8px 16px",
+            }}
+            onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = "var(--text-primary)")}
+            onMouseLeave={(e) => ((e.target as HTMLAnchorElement).style.color = "var(--text-secondary)")}
+          >
+            Sign In
+          </a>
+          <button
+            onClick={onLaunchPlanner}
+            className="btn btn-primary"
+            style={{ borderRadius: "999px", padding: "10px 24px", fontSize: "14px" }}
+          >
+            Launch Planner
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </motion.header>
+  );
+}
