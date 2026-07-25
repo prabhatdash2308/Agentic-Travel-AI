@@ -53,9 +53,7 @@ class WorkflowRequest(BaseModel):
     def cross_field_validation(self) -> "WorkflowRequest":
         if self.preferences and self.preferences.destinations:
             if len(self.preferences.destinations) > 5:
-                raise ValueError(
-                    "A single workflow supports at most 5 destinations."
-                )
+                raise ValueError("A single workflow supports at most 5 destinations.")
         return self
 
 
@@ -65,5 +63,9 @@ class WorkflowResponse(BaseModel):
     message: str = Field(..., description="Human-readable status message.")
     created_at: datetime = Field(..., description="UTC timestamp of creation.")
     estimated_steps: list[str] = Field(default_factory=list, description="Ordered planning steps.")
+
+    # Populated after the agent finishes
+    final_plan: str | None = Field(default=None, description="Full AI-generated travel plan (Markdown).")
+    completed_steps: list[str] = Field(default_factory=list, description="Steps completed so far.")
 
     model_config = {"use_enum_values": True}

@@ -20,8 +20,10 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
 
-    # LLM — not used until LLM integration sprint
+    # Google Generative AI
     GOOGLE_API_KEY: str = Field(default="", description="Google Generative AI API key")
+    GEMINI_MODEL: str = Field(default="gemini-2.0-flash", description="Gemini model identifier")
+    LLM_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
 
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
@@ -29,6 +31,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.APP_ENV == "production"
+
+    @property
+    def llm_configured(self) -> bool:
+        return bool(self.GOOGLE_API_KEY.strip())
 
 
 settings = Settings()
