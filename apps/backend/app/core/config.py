@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = Field(default="gemini-2.0-flash", description="Gemini model identifier")
     LLM_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
 
+    # Database
+    # Default: SQLite (dev). Override with postgres+asyncpg:// for prod.
+    DATABASE_URL: str = Field(
+        default="sqlite+aiosqlite:///./agentic_travel.db",
+        description="Async SQLAlchemy database URL",
+    )
+
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
@@ -35,6 +42,18 @@ class Settings(BaseSettings):
     @property
     def llm_configured(self) -> bool:
         return bool(self.GOOGLE_API_KEY.strip())
+
+    @property
+    def sync_database_url(self) -> str:
+        """
+        Synchronous DB URL for Alembic (which doesn't support async drivers).
+        Replaces asyncpg → psycopg2 and aiosqlite → (plain sqlite3).
+        """
+        url = self.DATABASE_URL
+        return (
+            url.replace("postgresql+asyncpg", "postgresql+psycopg2")
+               .replace("sqlite+aiosqlite", "sqlite")
+        )
 
 
 settings = Settings()
