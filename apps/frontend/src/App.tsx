@@ -1,20 +1,19 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
-
-type ViewState = "landing" | "workspace";
+import { SignInPage } from "./pages/auth/SignInPage";
+import { CreateAccountPage } from "./pages/auth/CreateAccountPage";
 
 function App() {
-  const [view, setView] = useState<ViewState>("landing");
-
   return (
-    <>
-      {view === "landing" ? (
-        <LandingPage onLaunchPlanner={() => setView("workspace")} />
-      ) : (
-        <WorkspacePage onBack={() => setView("landing")} />
-      )}
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<SignInPage />} />
+        <Route path="/register" element={<CreateAccountPage />} />
+        <Route path="/workspace" element={<WorkspacePage onBack={() => window.location.href = '/'} />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -7,21 +7,16 @@ import { TimelineSection } from "../components/landing/TimelineSection";
 import { DestinationsSection } from "../components/landing/DestinationsSection";
 import { FeaturesSection } from "../components/landing/FeaturesSection";
 import { DashboardSection } from "../components/landing/DashboardSection";
-import { PricingSection } from "../components/landing/PricingSection";
 import { TestimonialsSection } from "../components/landing/TestimonialsSection";
 import { LandingFooter } from "../components/landing/LandingFooter";
 
-interface LandingPageProps {
-  onLaunchPlanner: () => void;
-}
-
-export function LandingPage({ onLaunchPlanner }: LandingPageProps) {
+export function LandingPage() {
   return (
     <div style={{ background: "var(--bg)", color: "var(--text-primary)", minHeight: "100vh" }}>
-      <GlassNavbar onLaunchPlanner={onLaunchPlanner} />
+      <GlassNavbar />
 
       <main>
-        <HeroSection onLaunchPlanner={onLaunchPlanner} />
+        <HeroSection />
         <StatsSection />
 
         {/* We use an anchor for 'How it Works' */}
@@ -36,10 +31,6 @@ export function LandingPage({ onLaunchPlanner }: LandingPageProps) {
           <DestinationsSection />
           <FeaturesSection />
           <DashboardSection />
-        </div>
-
-        <div id="pricing">
-          <PricingSection />
         </div>
 
         <TestimonialsSection />

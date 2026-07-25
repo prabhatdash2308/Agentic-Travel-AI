@@ -1,4 +1,5 @@
 import { MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const GitHub = ({ size = 24, color = "currentColor", ...props }: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -24,37 +25,33 @@ const Linkedin = ({ size = 24, color = "currentColor", ...props }: any) => (
 export function LandingFooter() {
   const columns = [
     {
-      title: "Product",
-      links: ["Features", "Agents", "Pricing", "Changelog", "Roadmap"],
+      title: "Company",
+      links: ["About", "Careers", "Contact"],
     },
     {
       title: "Developers",
-      links: ["Documentation", "API Reference", "GitHub", "Architecture"],
+      links: ["Documentation", "API Reference", "GitHub"],
     },
     {
-      title: "Resources",
-      links: ["Blog", "Community", "Travel Guides", "Support"],
-    },
-    {
-      title: "Company",
-      links: ["About", "Careers", "Privacy", "Terms", "Contact"],
+      title: "Legal",
+      links: ["Privacy", "Terms"],
     },
   ];
 
   return (
     <footer style={{ background: "var(--bg)", borderTop: "1px solid var(--border)", paddingTop: "80px", paddingBottom: "40px" }}>
       <div className="max-w-content px-6 md:px-12">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
 
           {/* Brand Column */}
-          <div className="col-span-2 md:col-span-2">
-            <a href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "var(--text-primary)", marginBottom: "20px" }}>
+          <div>
+            <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "var(--text-primary)", marginBottom: "20px" }}>
               <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <MapPin size={16} color="#fff" strokeWidth={2.5} />
               </div>
               <span style={{ fontWeight: 700, fontSize: "18px", letterSpacing: "-0.02em" }}>Agentic Travel</span>
-            </a>
-            <p style={{ color: "var(--text-secondary)", fontSize: "15px", lineHeight: 1.6, maxWidth: "280px", marginBottom: "24px" }}>
+            </Link>
+            <p style={{ color: "var(--text-secondary)", fontSize: "14px", lineHeight: 1.6, maxWidth: "240px", marginBottom: "24px" }}>
               The autonomous AI travel planner capable of understanding natural language and coordinating multiple agents.
             </p>
             <div style={{ display: "flex", gap: "16px" }}>

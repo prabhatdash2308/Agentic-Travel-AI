@@ -1,15 +1,11 @@
-import { useRef, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
-import { Sparkles, Brain, Code, Network, Globe, Plane, Coffee, ArrowRight } from "lucide-react";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ArrowRight, Play, CheckCircle2, MapPin, Plane, CloudSun, Calendar } from "lucide-react";
 
-interface HeroSectionProps {
-  onLaunchPlanner: () => void;
-}
-
-export function HeroSection({ onLaunchPlanner }: HeroSectionProps) {
+export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Parallax for hero content
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
@@ -17,26 +13,6 @@ export function HeroSection({ onLaunchPlanner }: HeroSectionProps) {
   
   const yContent = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const opacityContent = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
-  // Mouse tracking for right-side visualizer
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const smoothX = useSpring(mouseX, { stiffness: 50, damping: 20 });
-  const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse coordinates to -1 to 1
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-      mouseX.set(x * 20); // max 20px movement
-      mouseY.set(y * 20);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
 
   return (
     <section
@@ -46,27 +22,16 @@ export function HeroSection({ onLaunchPlanner }: HeroSectionProps) {
         display: "flex",
         alignItems: "center",
         position: "relative",
-        paddingTop: "80px", // account for navbar
+        paddingTop: "120px",
+        paddingBottom: "80px",
         overflow: "hidden",
-        background: "var(--bg-deep)",
+        background: "var(--bg)",
       }}
     >
-      {/* Background radial gradient */}
-      <div
-        style={{
-          position: "absolute",
-          top: "10%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "1200px",
-          height: "800px",
-          background: "radial-gradient(circle at center, rgba(124,58,237,0.12) 0%, rgba(10,10,12,0) 70%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div className="noise-overlay" />
+      {/* Background glow */}
+      <div className="section-glow" />
 
-      <div className="max-w-content w-full px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
+      <div className="max-w-content w-full px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center z-10">
         
         {/* Left Column: Content */}
         <motion.div style={{ y: yContent, opacity: opacityContent }}>
@@ -88,141 +53,166 @@ export function HeroSection({ onLaunchPlanner }: HeroSectionProps) {
                 marginBottom: "32px",
               }}
             >
-              <Sparkles size={14} className="text-violet-400" />
-              <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>
-                Agentic Travel AI v2.0
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--accent)" }} />
+              <span className="text-label" style={{ color: "var(--text-primary)" }}>
+                Agentic Travel AI
               </span>
             </div>
 
             {/* Headline */}
             <h1 className="text-hero" style={{ marginBottom: "24px" }}>
-              Travel Planning, <br />
-              <span className="gradient-text">Reimagined by Autonomous AI.</span>
+              The AI Operating System for <span className="gradient-text">Travel.</span>
             </h1>
 
             {/* Subtext */}
             <p className="text-body-lg" style={{ color: "var(--text-secondary)", maxWidth: "540px", marginBottom: "48px" }}>
-              The world’s first multi-agent travel orchestration platform. Let specialized AI agents research flights, curate hotels, build itineraries, and optimize budgets — in seconds.
+              Experience luxury travel planning through autonomous AI. Let intelligent agents orchestrate your flights, curate accommodations, and design perfect itineraries with absolute precision.
             </p>
 
             {/* CTAs */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center" }}>
-              <button onClick={onLaunchPlanner} className="btn btn-primary btn-primary-lg">
-                Launch Planner
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", alignItems: "center", marginBottom: "48px" }}>
+              <Link to="/workspace" className="btn btn-primary btn-primary-lg" style={{ padding: "16px 32px" }}>
+                Start Planning
                 <ArrowRight size={18} />
-              </button>
-              <a href="#workflow" className="btn btn-ghost" style={{ padding: "16px 28px", fontSize: "16px", fontWeight: 600 }}>
-                Watch Workflow
+              </Link>
+              <a href="#how-it-works" className="btn btn-ghost" style={{ padding: "16px 32px", fontSize: "16px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px", borderRadius: "16px" }}>
+                <Play size={18} />
+                Watch Demo
               </a>
             </div>
+
+            {/* Trust Indicators */}
+            <div style={{ display: "flex", gap: "24px", alignItems: "center", flexWrap: "wrap" }}>
+              {[
+                "SOC2 Type II Certified",
+                "99.9% Uptime SLA",
+                "Trusted by 10k+ Travelers"
+              ].map((text, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <CheckCircle2 size={16} color="var(--text-muted)" />
+                  <span className="text-xs" style={{ color: "var(--text-muted)" }}>{text}</span>
+                </div>
+              ))}
+            </div>
+
           </motion.div>
         </motion.div>
 
-        {/* Right Column: AI Visualizer */}
-        <div style={{ position: "relative", height: "600px", perspective: "1000px" }}>
-          <motion.div
+        {/* Right Column: Realistic Product Preview */}
+        <motion.div 
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          style={{ position: "relative", height: "640px", width: "100%", perspective: "1000px" }}
+        >
+          <div 
             style={{
-              width: "100%",
+              position: "absolute",
+              top: 0,
+              right: "-10%",
+              width: "110%",
               height: "100%",
-              position: "relative",
-              x: smoothX,
-              y: smoothY,
+              background: "var(--surface-card)",
+              border: "1px solid var(--border)",
+              borderRadius: "24px",
+              boxShadow: "var(--shadow-lg)",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column"
             }}
           >
-            {/* Central Hub */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring", damping: 20 }}
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "120px",
-                height: "120px",
-                background: "var(--glass-bg-strong)",
-                backdropFilter: "blur(24px)",
-                border: "1px solid var(--accent)",
-                borderRadius: "32px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "var(--shadow-glow)",
-                zIndex: 10,
-              }}
-            >
-              <Brain size={36} color="var(--accent-hover)" />
-              <span style={{ marginTop: "12px", fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>Orchestrator</span>
-            </motion.div>
-
-            {/* Floating Nodes */}
-            {[
-              { icon: Globe, label: "Destinations", top: "10%", left: "20%", delay: 0.4 },
-              { icon: Plane, label: "Flights", top: "20%", left: "80%", delay: 0.5 },
-              { icon: Coffee, label: "Restaurants", top: "80%", left: "75%", delay: 0.6 },
-              { icon: Network, label: "Itinerary", top: "75%", left: "15%", delay: 0.7 },
-              { icon: Code, label: "APIs", top: "45%", left: "5%", delay: 0.8 },
-            ].map((node, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: node.delay, duration: 0.8 }}
-                style={{
-                  position: "absolute",
-                  top: node.top,
-                  left: node.left,
-                  padding: "16px",
-                  background: "var(--glass-bg)",
-                  border: "1px solid var(--glass-border)",
-                  borderRadius: "20px",
-                  backdropFilter: "blur(12px)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  animation: `float-slow ${6 + i}s ease-in-out infinite alternate`,
-                }}
-              >
-                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <node.icon size={18} color="var(--text-secondary)" />
+            {/* Fake App Header */}
+            <div style={{ height: "64px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 24px", justifyContent: "space-between", background: "var(--surface-el)" }}>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <MapPin size={16} color="#fff" />
                 </div>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-secondary)" }}>{node.label}</span>
-              </motion.div>
-            ))}
+                <span style={{ fontWeight: 600, fontSize: "15px" }}>Kyoto Autumn Tour</span>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-2)" }} />
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-2)" }} />
+              </div>
+            </div>
 
-            {/* Connecting SVG Lines */}
-            <svg
-              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }}
-            >
-              <motion.path
-                d="M 120 280 C 180 280, 250 300, 300 300"
-                stroke="var(--accent-subtle)"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray="6 6"
-                style={{ animation: "dash-flow 2s linear infinite" }}
-              />
-              <motion.path
-                d="M 400 300 C 450 300, 480 200, 500 150"
-                stroke="var(--accent-subtle)"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray="6 6"
-                style={{ animation: "dash-flow 2s linear infinite reverse" }}
-              />
-              <motion.path
-                d="M 350 400 C 350 450, 450 480, 480 500"
-                stroke="var(--accent-subtle)"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray="6 6"
-                style={{ animation: "dash-flow 2s linear infinite" }}
-              />
-            </svg>
-          </motion.div>
-        </div>
+            {/* App Content Area */}
+            <div style={{ flex: 1, padding: "24px", display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", background: "var(--surface-2)" }}>
+              
+              {/* Left Canvas: Itinerary / Map */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                {/* Weather & Flight Widget */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                  <div className="card" style={{ padding: "16px", background: "var(--surface-card)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+                      <span className="text-xs text-muted">WEATHER</span>
+                      <CloudSun size={16} className="text-muted" />
+                    </div>
+                    <div style={{ fontSize: "24px", fontWeight: 600 }}>18°C</div>
+                    <div className="text-xs text-muted">Partly cloudy in Kyoto</div>
+                  </div>
+                  <div className="card" style={{ padding: "16px", background: "var(--surface-card)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+                      <span className="text-xs text-muted">NEXT FLIGHT</span>
+                      <Plane size={16} className="text-muted" />
+                    </div>
+                    <div style={{ fontSize: "16px", fontWeight: 600 }}>JAL 045</div>
+                    <div className="text-xs text-muted">SFO ➝ KIX • 11h 20m</div>
+                  </div>
+                </div>
+
+                {/* Timeline */}
+                <div className="card" style={{ flex: 1, padding: "24px", background: "var(--surface-card)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
+                    <Calendar size={18} className="text-muted" />
+                    <span style={{ fontWeight: 600 }}>Day 1: Arrival & Exploration</span>
+                  </div>
+                  
+                  {[
+                    { time: "14:00", title: "Check-in at Ritz Carlton", type: "hotel" },
+                    { time: "16:30", title: "Nishiki Market Tour", type: "activity" },
+                    { time: "19:00", title: "Dinner at Kikunoi", type: "dining" },
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: "16px", marginBottom: i === 2 ? 0 : "24px" }}>
+                      <div style={{ width: "48px", fontSize: "13px", color: "var(--text-muted)", paddingTop: "2px" }}>{item.time}</div>
+                      <div style={{ position: "relative", paddingLeft: "16px", borderLeft: "1px solid var(--border)" }}>
+                        <div style={{ position: "absolute", left: "-4px", top: "6px", width: "8px", height: "8px", borderRadius: "50%", background: "var(--accent)" }} />
+                        <div style={{ fontWeight: 500, fontSize: "14px", marginBottom: "4px" }}>{item.title}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>Agent verified & booked</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Sidebar: Agent Activity */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div className="text-label" style={{ marginBottom: "8px" }}>Agent Execution</div>
+                {[
+                  { name: "Flight Agent", status: "Done", color: "var(--success)" },
+                  { name: "Hotel Agent", status: "Done", color: "var(--success)" },
+                  { name: "Dining Agent", status: "Working...", color: "var(--accent)" },
+                  { name: "Logistics Agent", status: "Queued", color: "var(--text-muted)" }
+                ].map((agent, i) => (
+                  <div key={i} className="card" style={{ padding: "16px", background: "var(--surface-card)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: 600 }}>{agent.name}</span>
+                      <span style={{ fontSize: "11px", color: agent.color }}>{agent.status}</span>
+                    </div>
+                    <div style={{ height: "4px", background: "var(--surface-el)", borderRadius: "2px", overflow: "hidden" }}>
+                      <motion.div 
+                        initial={{ width: "0%" }}
+                        animate={{ width: agent.status === "Done" ? "100%" : agent.status === "Working..." ? "65%" : "0%" }}
+                        transition={{ duration: 1.5, delay: 0.5 + (i * 0.2) }}
+                        style={{ height: "100%", background: agent.color }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
