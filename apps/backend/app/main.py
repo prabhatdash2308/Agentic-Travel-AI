@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.router import router
+from app.db import create_all_tables
 from app.core import (
     AgenticBaseError,
     NotFoundError,
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     async def on_startup() -> None:
+        await create_all_tables()
         logger.info(
             "🚀 %s v%s | env=%s log_level=%s",
             settings.APP_NAME,
