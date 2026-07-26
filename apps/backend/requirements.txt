@@ -108,6 +108,7 @@ typing_extensions==4.15.0
 tzdata==2026.2
 urllib3==2.6.3
 uuid_utils==0.14.1
+uvicorn[standard]==0.35.0
 w3lib==2.4.1
 wcwidth==0.6.0
 websockets==15.0.1
