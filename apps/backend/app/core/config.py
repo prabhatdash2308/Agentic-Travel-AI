@@ -33,7 +33,11 @@ class Settings(BaseSettings):
     )
 
     # CORS — allow both CRA (3000) and Vite (5173) dev servers
-    ALLOWED_ORIGINS: list[str] = ["https://agentic-travel-ai.vercel.app",]
+    ALLOWED_ORIGINS = [
+        "https://agentic-travel-ai.vercel.app",
+        "https://agentic-travel-42cuuabqv-prabhatdash2308-9066s-projects.vercel.app",
+        "http://localhost:5173",
+    ]
 
     @property
     def is_production(self) -> bool:
