@@ -139,13 +139,13 @@ uvicorn app.main:app --reload
 Backend:
 
 ```
-http://localhost:8000
+https://agentic-travel-ai.onrender.com
 ```
 
 API Docs:
 
 ```
-http://localhost:8000/docs
+https://agentic-travel-ai.onrender.com/docs
 ```
 
 ---

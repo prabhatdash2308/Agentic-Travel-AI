@@ -9,7 +9,7 @@ export default defineConfig({
     // Proxy API calls to FastAPI backend during development
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "https://agentic-travel-ai.onrender.com",
         changeOrigin: true,
         rewrite: (path) => path,
       },

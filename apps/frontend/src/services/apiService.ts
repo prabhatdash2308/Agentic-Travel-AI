@@ -11,6 +11,8 @@
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
+console.log("API BASE =", API_BASE);
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type WorkflowStatus =
@@ -70,6 +72,9 @@ async function handleResponse<T>(res: Response): Promise<T> {
  * Returns immediately with a workflow_id (HTTP 202).
  */
 export async function startWorkflow(request: WorkflowRequest): Promise<WorkflowResponse> {
+  console.log("API_BASE =", API_BASE);
+  console.log("Calling:", `${API_BASE}/api/workflow/run`);
+
   const res = await fetch(`${API_BASE}/api/workflow/run`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
