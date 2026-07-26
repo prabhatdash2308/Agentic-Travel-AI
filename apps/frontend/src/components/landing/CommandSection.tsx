@@ -38,7 +38,7 @@ export function CommandSection() {
             <span style={{ color: "var(--text-muted)" }}>We'll handle the rest.</span>
           </h2>
           <p className="text-body-lg text-secondary" style={{ maxWidth: "600px", margin: "0 auto" }}>
-            Powered by a state-of-the-art NLP engine, Wayfarer understands complex constraints, preferences, and multi-destination requests.
+            Powered by a state-of-the-art NLP engine, Eagle Agentic AI understands complex constraints, preferences, and multi-destination requests.
           </p>
         </motion.div>
 

@@ -1,5 +1,13 @@
-import { MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
+
+function EagleLogo() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="8" fill="#4F46E5"/>
+      <path d="M16 6C16 6 8.5 10.5 7 15C9.5 14 12.5 14 14.5 16L16 26L17.5 16C19.5 14 22.5 14 25 15C23.5 10.5 16 6 16 6Z" fill="white" fillOpacity="0.95"/>
+    </svg>
+  );
+}
 
 const GitHub = ({ size = 24, color = "currentColor", ...props }: any) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -46,13 +54,11 @@ export function LandingFooter() {
           {/* Brand Column */}
           <div>
             <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "var(--text-primary)", marginBottom: "20px" }}>
-              <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <MapPin size={16} color="#fff" strokeWidth={2.5} />
-              </div>
-              <span style={{ fontWeight: 700, fontSize: "18px", letterSpacing: "-0.02em" }}>Agentic Travel</span>
+              <EagleLogo />
+              <span style={{ fontWeight: 700, fontSize: "17px", letterSpacing: "-0.025em" }}>Eagle Agentic AI</span>
             </Link>
             <p style={{ color: "var(--text-secondary)", fontSize: "14px", lineHeight: 1.6, maxWidth: "240px", marginBottom: "24px" }}>
-              The autonomous AI travel planner capable of understanding natural language and coordinating multiple agents.
+              The autonomous AI travel intelligence platform. Coordinating specialized agents to plan extraordinary trips.
             </p>
             <div style={{ display: "flex", gap: "16px" }}>
               {[Twitter, GitHub, Linkedin].map((Icon, i) => (
@@ -83,7 +89,7 @@ export function LandingFooter() {
         {/* Bottom Bar */}
         <div style={{ borderTop: "1px solid var(--border)", paddingTop: "32px", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
           <div style={{ fontSize: "14px", color: "var(--text-muted)" }}>
-            &copy; {new Date().getFullYear()} Agentic Travel AI. All rights reserved.
+            &copy; {new Date().getFullYear()} Eagle Agentic AI. All rights reserved.
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "var(--text-muted)" }}>
             <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: "var(--success)" }} />

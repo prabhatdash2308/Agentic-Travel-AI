@@ -1,15 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wayfarer — AI Travel Intelligence</title>
-    <meta name="description" content="Plan extraordinary trips with intelligent AI agents. Wayfarer orchestrates flights, hotels, itineraries and budgets — instantly." />
+
+    <!-- Primary Meta -->
+    <title>Eagle Agentic AI — Intelligent Travel Planning</title>
+    <meta name="description" content="Eagle Agentic AI orchestrates specialized AI agents to research destinations, plan itineraries, and estimate budgets — in seconds. The AI operating system for travel." />
+    <meta name="keywords" content="AI travel planner, autonomous agents, LangGraph, itinerary AI, travel intelligence, Eagle AI" />
+    <meta name="author" content="Eagle Agentic AI" />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#09090B" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Eagle Agentic AI — Intelligent Travel Planning" />
+    <meta property="og:description" content="Autonomous AI agents plan your perfect trip. Research, itineraries, budgets — all in seconds." />
+    <meta property="og:url" content="https://eagle-ai.travel" />
+    <meta property="og:site_name" content="Eagle Agentic AI" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Eagle Agentic AI — Intelligent Travel Planning" />
+    <meta name="twitter:description" content="Autonomous AI agents plan your perfect trip. Research, itineraries, budgets — all in seconds." />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap" rel="stylesheet" />
+
+    <!-- Prevent flash of wrong theme -->
+    <script>
+      (function () {
+        var stored = localStorage.getItem('eagle-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored === 'light' ? 'light' : stored === 'dark' ? 'dark' : (prefersDark ? 'dark' : 'light');
+        document.documentElement.className = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

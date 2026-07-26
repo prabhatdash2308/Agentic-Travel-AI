@@ -1,14 +1,27 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { MapPin, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+function EagleLogo({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="32" height="32" rx="8" fill="#4F46E5"/>
+      <path d="M16 6C16 6 8.5 10.5 7 15C9.5 14 12.5 14 14.5 16L16 26L17.5 16C19.5 14 22.5 14 25 15C23.5 10.5 16 6 16 6Z" fill="white" fillOpacity="0.95"/>
+    </svg>
+  );
+}
 
 interface GlassNavbarProps {
-  onLaunchPlanner: () => void;
+  onLaunchPlanner?: () => void;
 }
 
 export function GlassNavbar({ onLaunchPlanner }: GlassNavbarProps) {
+  const navigate = useNavigate();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleLaunch = onLaunchPlanner ?? (() => navigate("/workspace"));
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
@@ -51,7 +64,7 @@ export function GlassNavbar({ onLaunchPlanner }: GlassNavbarProps) {
         {/* Logo */}
         <a
           href="/"
-          aria-label="Agentic Travel AI home"
+          aria-label="Eagle Agentic AI home"
           style={{
             display: "flex",
             alignItems: "center",
@@ -60,22 +73,9 @@ export function GlassNavbar({ onLaunchPlanner }: GlassNavbarProps) {
             color: "var(--text-primary)",
           }}
         >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "10px",
-              background: "var(--accent)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 12px rgba(124,58,237,0.4)",
-            }}
-          >
-            <MapPin size={16} color="#fff" strokeWidth={2.5} />
-          </div>
-          <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.02em" }}>
-            Agentic Travel
+          <EagleLogo size={30} />
+          <span style={{ fontWeight: 700, fontSize: "16px", letterSpacing: "-0.025em" }}>
+            Eagle
           </span>
         </a>
 
@@ -127,12 +127,13 @@ export function GlassNavbar({ onLaunchPlanner }: GlassNavbarProps) {
             Sign In
           </a>
           <button
-            onClick={onLaunchPlanner}
+            onClick={handleLaunch}
+            id="launch-planner-btn"
             className="btn btn-primary"
-            style={{ borderRadius: "999px", padding: "10px 24px", fontSize: "14px" }}
+            style={{ borderRadius: "12px", padding: "10px 22px", fontSize: "14px", fontWeight: 600 }}
           >
             Launch Planner
-            <ArrowRight size={16} />
+            <ArrowRight size={15} />
           </button>
         </div>
       </div>

@@ -53,7 +53,7 @@ function StepIcon({ status, Icon }: { status: Status; Icon: React.ElementType })
       <motion.div
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ type: "spring", stiffness: 400, damping: 15 }}
         style={{
           width: "40px",
           height: "40px",
@@ -65,16 +65,31 @@ function StepIcon({ status, Icon }: { status: Status; Icon: React.ElementType })
           justifyContent: "center",
           flexShrink: 0,
           color: "var(--success)",
+          boxShadow: "0 0 16px rgba(34,197,94,0.3)",
         }}
       >
-        <Check size={18} strokeWidth={2.5} />
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <Check size={18} strokeWidth={2.5} />
+        </motion.div>
       </motion.div>
     );
   }
 
   if (status === "active") {
     return (
-      <div
+      <motion.div
+        animate={{
+          boxShadow: [
+            "0 0 12px rgba(124,58,237,0.2)",
+            "0 0 20px rgba(124,58,237,0.4)",
+            "0 0 12px rgba(124,58,237,0.2)",
+          ],
+        }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         style={{
           width: "40px",
           height: "40px",
@@ -87,16 +102,17 @@ function StepIcon({ status, Icon }: { status: Status; Icon: React.ElementType })
           flexShrink: 0,
           color: "var(--accent-hover)",
           position: "relative",
-          boxShadow: "0 0 12px rgba(124,58,237,0.2)",
         }}
       >
-        <Loader2 size={18} strokeWidth={2} style={{ animation: "spin 1.2s linear infinite" }} />
-      </div>
+        <Loader2 size={18} strokeWidth={2} style={{ animation: "spin 1s linear infinite" }} />
+      </motion.div>
     );
   }
 
   return (
-    <div
+    <motion.div
+      whileHover={{ scale: 1.05, borderColor: "var(--border-hover)" }}
+      transition={{ duration: 0.2 }}
       style={{
         width: "40px",
         height: "40px",
@@ -108,10 +124,11 @@ function StepIcon({ status, Icon }: { status: Status; Icon: React.ElementType })
         justifyContent: "center",
         flexShrink: 0,
         color: "var(--text-muted)",
+        cursor: "default",
       }}
     >
       <Icon size={18} strokeWidth={1.75} />
-    </div>
+    </motion.div>
   );
 }
 
@@ -145,7 +162,10 @@ export function AgentTimeline({ steps }: AgentTimelineProps) {
               <StepIcon status={step.status} Icon={Icon} />
 
               {!isLast && (
-                <div
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: "24px" }}
+                  transition={{ duration: 0.4, delay: index * 0.08 }}
                   style={{
                     width: "1px",
                     flex: 1,
@@ -154,6 +174,8 @@ export function AgentTimeline({ steps }: AgentTimelineProps) {
                     background:
                       step.status === "done"
                         ? "rgba(34,197,94,0.3)"
+                        : step.status === "active"
+                        ? "rgba(124,58,237,0.3)"
                         : "var(--border)",
                     transition: "background 0.6s ease",
                   }}
@@ -163,15 +185,29 @@ export function AgentTimeline({ steps }: AgentTimelineProps) {
 
             {/* Right column: content card */}
             <motion.div
-              initial={{ opacity: 0, x: 8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.35, delay: index * 0.08, ease: [0.4, 0, 0.2, 1] }}
+              initial={{ opacity: 0, x: 12, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 0.4, delay: index * 0.1, ease: [0.4, 0, 0.2, 1] }}
+              whileHover={{ scale: 1.01 }}
               style={{
                 flex: 1,
                 paddingBottom: isLast ? "0" : "16px",
               }}
             >
-              <div
+              <motion.div
+                animate={{
+                  borderColor:
+                    step.status === "active"
+                      ? "rgba(124,58,237,0.4)"
+                      : step.status === "done"
+                      ? "rgba(34,197,94,0.2)"
+                      : "var(--border)",
+                  boxShadow:
+                    step.status === "active"
+                      ? ["0 0 20px rgba(124,58,237,0.08)", "0 0 30px rgba(124,58,237,0.12)", "0 0 20px rgba(124,58,237,0.08)"]
+                      : "none",
+                }}
+                transition={{ duration: step.status === "active" ? 2 : 0.3, repeat: step.status === "active" ? Infinity : 0 }}
                 style={{
                   background:
                     step.status === "active"
@@ -187,10 +223,6 @@ export function AgentTimeline({ steps }: AgentTimelineProps) {
                   borderRadius: "16px",
                   padding: "16px 18px",
                   transition: "all var(--transition-md)",
-                  boxShadow:
-                    step.status === "active"
-                      ? "0 0 20px rgba(124,58,237,0.08)"
-                      : "none",
                 }}
               >
                 <div
@@ -301,7 +333,7 @@ export function AgentTimeline({ steps }: AgentTimelineProps) {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         );

@@ -6,6 +6,10 @@ import {
   Zap,
   Clock,
   ArrowLeft,
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import "../App.css";
 
@@ -15,59 +19,74 @@ import { PromptBox } from "../components/PromptBox";
 import { AgentTimeline } from "../components/AgentTimeline";
 import { MetricCard } from "../components/MetricCard";
 import { OutputPanel } from "../components/OutputPanel";
-
-type Step = {
-  title: string;
-  status: "pending" | "active" | "done";
-};
-
-const INITIAL_STEPS: Step[] = [
-  { title: "Understand request", status: "done" },
-  { title: "Plan tasks", status: "active" },
-  { title: "Call travel tools", status: "pending" },
-  { title: "Generate itinerary", status: "pending" },
-];
-
-const AFTER_STEPS: Step[] = [
-  { title: "Understand request", status: "done" },
-  { title: "Plan tasks", status: "done" },
-  { title: "Call travel tools", status: "active" },
-  { title: "Generate itinerary", status: "pending" },
-];
-
-const DONE_STEPS: Step[] = [
-  { title: "Understand request", status: "done" },
-  { title: "Plan tasks", status: "done" },
-  { title: "Call travel tools", status: "done" },
-  { title: "Generate itinerary", status: "done" },
-];
+import { useWorkflow } from "../hooks/useWorkflow";
+import { useToast } from "../context/ToastContext";
 
 interface WorkspacePageProps {
   onBack: () => void;
 }
 
+/** Map workflow steps to AgentTimeline format */
+function buildTimelineSteps(
+  estimatedSteps: string[],
+  completedSteps: string[],
+  isRunning: boolean
+) {
+  if (estimatedSteps.length === 0) {
+    // Default steps when no workflow is running
+    return [
+      { title: "Parse travel intent", status: "pending" as const },
+      { title: "Research destinations", status: "pending" as const },
+      { title: "Draft itinerary", status: "pending" as const },
+      { title: "Assemble final plan", status: "pending" as const },
+    ];
+  }
+
+  const completedSet = new Set(completedSteps);
+
+  return estimatedSteps.map((step, idx) => {
+    if (completedSet.has(step)) {
+      return { title: step, status: "done" as const };
+    }
+    // The first non-completed step is "active" if workflow is running
+    const firstPending = estimatedSteps.findIndex((s) => !completedSet.has(s));
+    if (isRunning && idx === firstPending) {
+      return { title: step, status: "active" as const };
+    }
+    return { title: step, status: "pending" as const };
+  });
+}
+
 export function WorkspacePage({ onBack }: WorkspacePageProps) {
   const [prompt, setPrompt] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [hasResult, setHasResult] = useState(false);
-  const [steps, setSteps] = useState<Step[]>(INITIAL_STEPS);
+  const { state, run, reset } = useWorkflow();
+  const { success, error: toastError } = useToast();
 
-  const handleGenerate = () => {
-    if (!prompt.trim()) return;
-    setLoading(true);
-    setHasResult(false);
-    setSteps(INITIAL_STEPS);
+  const isLoading = state.isLoading;
+  const hasResult = state.status === "completed" && !!state.finalPlan;
+  const hasError = state.status === "failed";
+  const isRunning = state.status === "running" || state.status === "pending";
 
-    // Simulate agent pipeline
-    setTimeout(() => {
-      setSteps(AFTER_STEPS);
-    }, 1500);
+  const timelineSteps = buildTimelineSteps(
+    state.estimatedSteps,
+    state.completedSteps,
+    isRunning || isLoading
+  );
 
-    setTimeout(() => {
-      setSteps(DONE_STEPS);
-      setLoading(false);
-      setHasResult(true);
-    }, 3800);
+  const handleGenerate = async () => {
+    if (!prompt.trim() || isLoading) return;
+    if (prompt.trim().length < 10) {
+      toastError("Input too short", "Please provide a more detailed travel request (at least 10 characters).");
+      return;
+    }
+    await run({ query: prompt.trim() });
+    success("Started", "AI agents are now planning your trip...");
+  };
+
+  const handleReset = () => {
+    reset();
+    setPrompt("");
+    success("Reset", "Workspace cleared. Ready for a new trip.");
   };
 
   return (
@@ -147,9 +166,7 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                 }}
               >
                 Plan extraordinary trips{" "}
-                <span className="gradient-text">
-                  with AI agents
-                </span>
+                <span className="gradient-text">with AI agents</span>
               </h1>
 
               {/* Subtext */}
@@ -163,8 +180,8 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                   fontWeight: 400,
                 }}
               >
-                Wayfarer orchestrates specialized AI agents to find flights, hotels,
-                itineraries, and budgets — in seconds.
+                Eagle orchestrates specialized AI agents to research destinations,
+                plan itineraries, and estimate budgets — in seconds.
               </p>
             </motion.div>
           </div>
@@ -198,28 +215,28 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
             >
               <MetricCard
                 icon={<Wrench size={16} strokeWidth={1.75} />}
-                value={12}
-                label="Tools Connected"
+                value={7}
+                label="Agent Nodes"
                 delay={200}
               />
               <MetricCard
                 icon={<Cpu size={16} strokeWidth={1.75} />}
-                value={7}
+                value={3}
                 label="AI Agents"
                 delay={300}
               />
               <MetricCard
                 icon={<Clock size={16} strokeWidth={1.75} />}
-                value={18}
-                suffix="s"
-                label="Avg. Response"
+                value={state.completedSteps.length || 0}
+                suffix={`/${state.estimatedSteps.length || 8}`}
+                label="Steps Done"
                 delay={400}
               />
               <MetricCard
                 icon={<Zap size={16} strokeWidth={1.75} />}
-                value={92}
+                value={hasResult ? 100 : isRunning ? Math.round((state.completedSteps.length / Math.max(state.estimatedSteps.length, 1)) * 100) : 0}
                 suffix="%"
-                label="Confidence"
+                label="Progress"
                 delay={500}
               />
             </motion.div>
@@ -257,8 +274,59 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                 prompt={prompt}
                 onPromptChange={setPrompt}
                 onGenerate={handleGenerate}
-                loading={loading}
+                loading={isLoading}
               />
+
+              {/* Error banner */}
+              <AnimatePresence>
+                {hasError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{
+                      marginTop: "16px",
+                      padding: "14px 16px",
+                      background: "rgba(239,68,68,0.08)",
+                      border: "1px solid rgba(239,68,68,0.25)",
+                      borderRadius: "12px",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "10px",
+                    }}
+                  >
+                    <AlertTriangle size={16} color="var(--danger)" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--danger)", marginBottom: "2px" }}>
+                        Planning failed
+                      </div>
+                      <div style={{ fontSize: "12.5px", color: "var(--text-muted)", lineHeight: 1.5 }}>
+                        {state.error}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleReset}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--text-muted)",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontSize: "12px",
+                        fontFamily: "inherit",
+                        padding: "2px 6px",
+                        borderRadius: "6px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <RefreshCw size={12} />
+                      Retry
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             {/* Output panel */}
@@ -267,7 +335,11 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
             >
-              <OutputPanel loading={loading} hasResult={hasResult} />
+              <OutputPanel
+                loading={isLoading}
+                hasResult={hasResult}
+                finalPlan={state.finalPlan}
+              />
             </motion.div>
           </div>
 
@@ -300,7 +372,7 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                     Agent Workflow
                   </h3>
                   <AnimatePresence mode="wait">
-                    {loading ? (
+                    {isLoading ? (
                       <motion.span
                         key="live"
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -328,7 +400,28 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                         className="badge badge-done"
                         style={{ fontSize: "11px" }}
                       >
+                        <CheckCircle2 size={10} />
                         Complete
+                      </motion.span>
+                    ) : hasError ? (
+                      <motion.span
+                        key="error"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        style={{
+                          fontSize: "11px",
+                          padding: "3px 8px",
+                          borderRadius: "999px",
+                          background: "rgba(239,68,68,0.1)",
+                          color: "var(--danger)",
+                          border: "1px solid rgba(239,68,68,0.2)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                        }}
+                      >
+                        <AlertTriangle size={10} />
+                        Failed
                       </motion.span>
                     ) : (
                       <motion.span
@@ -342,15 +435,17 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                   </AnimatePresence>
                 </div>
                 <p style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-                  {loading
-                    ? "Agents are executing your request..."
+                  {isLoading
+                    ? `Step ${state.completedSteps.length + 1} of ${state.estimatedSteps.length || "?"} running...`
                     : hasResult
-                    ? "All agents completed successfully"
+                    ? `All ${state.completedSteps.length} steps completed`
+                    : hasError
+                    ? "Workflow encountered an error"
                     : "Ready to process your travel request"}
                 </p>
               </div>
 
-              <AgentTimeline steps={steps} />
+              <AgentTimeline steps={timelineSteps} />
             </div>
 
             {/* System info card */}
@@ -376,10 +471,26 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
               </h4>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {[
-                  { label: "Agent Status", value: loading ? "Running" : "Ready", positive: true },
-                  { label: "Tools Connected", value: "12 / 12", positive: true },
-                  { label: "Workflow Mode", value: "Agentic AI", positive: true },
-                  { label: "Model", value: "GPT-4o + Gemini", positive: true },
+                  {
+                    label: "Agent Status",
+                    value: isLoading ? "Running" : hasResult ? "Done" : "Ready",
+                    positive: true,
+                  },
+                  {
+                    label: "Workflow Mode",
+                    value: "LangGraph",
+                    positive: true,
+                  },
+                  {
+                    label: "Model",
+                    value: "Llama 3.3 70B",
+                    positive: true,
+                  },
+                  {
+                    label: "Backend",
+                    value: "FastAPI + SQLite",
+                    positive: true,
+                  },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -398,13 +509,45 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
                         fontSize: "12.5px",
                         fontWeight: 600,
                         color: item.positive ? "var(--accent-hover)" : "var(--text-muted)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
                       }}
                     >
+                      {isLoading && item.label === "Agent Status" && (
+                        <Loader2 size={10} style={{ animation: "spin 1s linear infinite" }} />
+                      )}
                       {item.value}
                     </span>
                   </div>
                 ))}
               </div>
+
+              {/* Workflow ID display */}
+              {state.workflowId && (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    padding: "8px 12px",
+                    background: "var(--surface-2)",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px" }}>
+                    Workflow ID
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      fontFamily: "monospace",
+                      color: "var(--text-secondary)",
+                      wordBreak: "break-all",
+                    }}
+                  >
+                    {state.workflowId}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.aside>
         </main>
@@ -428,12 +571,12 @@ export function WorkspacePage({ onBack }: WorkspacePageProps) {
               fontSize: "13px",
             }}
           >
-            <span style={{ fontWeight: 600, color: "var(--text-secondary)" }}>Agentic Travel AI</span>
+            <span style={{ fontWeight: 600, color: "var(--text-secondary)" }}>Eagle Agentic AI</span>
             <span>·</span>
             <span>Intelligent Planner</span>
           </div>
           <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-            Powered by multi-agent orchestration
+            Powered by LangGraph + Groq Llama 3.3 70B
           </div>
         </footer>
       </div>

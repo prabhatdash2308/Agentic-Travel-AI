@@ -12,27 +12,27 @@ class Settings(BaseSettings):
     )
 
     # Application
-    APP_NAME: str = "Agentic Travel AI"
-    APP_VERSION: str = "0.1.0"
+    APP_NAME: str = "Eagle Agentic AI"
+    APP_VERSION: str = "1.0.0"
     APP_ENV: Literal["development", "staging", "production"] = "development"
     DEBUG: bool = Field(default=True)
 
     # Logging
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
 
-    # Google Generative AI
-    GOOGLE_API_KEY: str = Field(default="", description="Google Generative AI API key")
-    GEMINI_MODEL: str = Field(default="gemini-2.0-flash", description="Gemini model identifier")
-    LLM_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
+    # Groq LLM (primary — Llama 3.3 70B)
+    GROQ_API_KEY: str = Field(default="", description="Groq API key")
+    GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile", description="Groq model identifier")
+    LLM_TEMPERATURE: float = Field(default=0.3, ge=0.0, le=2.0)
 
     # Database
     # Default: SQLite (dev). Override with postgres+asyncpg:// for prod.
     DATABASE_URL: str = Field(
-        default="sqlite+aiosqlite:///./agentic_travel.db",
+        default="sqlite+aiosqlite:///./eagle_ai.db",
         description="Async SQLAlchemy database URL",
     )
 
-    # CORS
+    # CORS — allow both CRA (3000) and Vite (5173) dev servers
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     @property
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
 
     @property
     def llm_configured(self) -> bool:
-        return bool(self.GOOGLE_API_KEY.strip())
+        return bool(self.GROQ_API_KEY.strip())
 
     @property
     def sync_database_url(self) -> str:

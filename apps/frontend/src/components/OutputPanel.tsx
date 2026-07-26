@@ -1,22 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  MapPin,
-  Plane,
-  Building2,
-  Sun,
-  IndianRupee,
-  Calendar,
-  Utensils,
-  Star,
-  Clock,
-  Sparkles,
-} from "lucide-react";
+import { MapPin, Sparkles, Download, Copy, CheckCheck } from "lucide-react";
+import { useState, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 
 interface OutputPanelProps {
   loading: boolean;
   hasResult: boolean;
+  finalPlan: string | null;
 }
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
 
 function EmptyState() {
   return (
@@ -90,7 +84,7 @@ function EmptyState() {
             marginBottom: "6px",
           }}
         >
-          Your itinerary will appear here
+          Your AI-generated itinerary will appear here
         </h3>
         <p
           style={{
@@ -100,7 +94,8 @@ function EmptyState() {
             maxWidth: "280px",
           }}
         >
-          Describe your trip above and click generate. Wayfarer will orchestrate flights, hotels, and activities instantly.
+          Describe your trip above and click generate. The AI agents will research
+          destinations, plan your days, and estimate costs.
         </p>
       </div>
 
@@ -108,7 +103,7 @@ function EmptyState() {
       <div
         style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginTop: "8px" }}
       >
-        {["Flights", "Hotels", "Itinerary", "Budget", "Weather"].map((f) => (
+        {["Itinerary", "Budget", "Activities", "Tips", "Logistics"].map((f) => (
           <span
             key={f}
             style={{
@@ -129,535 +124,317 @@ function EmptyState() {
   );
 }
 
-function TravelResult() {
-  const days = [
-    {
-      day: 1,
-      title: "Arrival & North Goa",
-      activities: ["Calangute Beach", "Sunset at Anjuna", "Dinner at Infantaria"],
-    },
-    {
-      day: 2,
-      title: "Old Goa & Culture",
-      activities: ["Basilica of Bom Jesus", "Panaji city walk", "Spice plantation tour"],
-    },
-    {
-      day: 3,
-      title: "South Goa & Departure",
-      activities: ["Palolem Beach morning", "Dudhsagar Falls", "Airport transfer"],
-    },
-  ];
+// ─── Markdown Renderer ────────────────────────────────────────────────────────
+
+function MarkdownContent({ content }: { content: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [content]);
+
+  const handleDownload = useCallback(() => {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "travel-plan.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [content]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-      style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      aria-label="Travel plan results"
+      aria-label="AI-generated travel plan"
     >
-      {/* Header */}
+      {/* Action bar */}
       <div
         style={{
-          padding: "20px 24px",
-          background: "var(--surface-el)",
-          borderRadius: "16px",
-          border: "1px solid var(--border)",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "8px",
+          marginBottom: "20px",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
-          <div>
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "var(--accent-hover)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                marginBottom: "6px",
-              }}
-            >
-              Generated Itinerary
-            </div>
-            <h3
-              style={{
-                fontSize: "20px",
-                fontWeight: 700,
-                letterSpacing: "-0.025em",
-                color: "var(--text-primary)",
-                lineHeight: 1.2,
-                marginBottom: "8px",
-              }}
-            >
-              3 Days in Goa
-            </h3>
-            <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-              {[
-                { icon: Calendar, text: "Next weekend" },
-                { icon: Clock, text: "3 nights" },
-                { icon: IndianRupee, text: "₹18,400 total" },
-              ].map(({ icon: Icon, text }) => (
-                <div
-                  key={text}
+        <button
+          onClick={handleCopy}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "6px 12px",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "8px",
+            color: "var(--text-secondary)",
+            fontSize: "12px",
+            fontWeight: 500,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            transition: "all 0.2s",
+          }}
+          aria-label="Copy itinerary to clipboard"
+        >
+          {copied ? (
+            <>
+              <CheckCheck size={13} color="var(--success)" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Copy size={13} />
+              Copy
+            </>
+          )}
+        </button>
+        <button
+          onClick={handleDownload}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "6px 12px",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "8px",
+            color: "var(--text-secondary)",
+            fontSize: "12px",
+            fontWeight: 500,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            transition: "all 0.2s",
+          }}
+          aria-label="Download itinerary as Markdown"
+        >
+          <Download size={13} />
+          Download
+        </button>
+      </div>
+
+      {/* Markdown output */}
+      <div
+        className="markdown-output"
+        style={{
+          color: "var(--text-primary)",
+          lineHeight: 1.75,
+          fontSize: "14.5px",
+        }}
+      >
+        <ReactMarkdown
+          components={{
+            h1: ({ children }) => (
+              <h1
+                style={{
+                  fontSize: "22px",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "var(--text-primary)",
+                  borderBottom: "1px solid var(--border)",
+                  paddingBottom: "12px",
+                  marginBottom: "20px",
+                  marginTop: "0",
+                }}
+              >
+                {children}
+              </h1>
+            ),
+            h2: ({ children }) => (
+              <h2
+                style={{
+                  fontSize: "17px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  color: "var(--text-primary)",
+                  marginTop: "28px",
+                  marginBottom: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <span
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                    fontSize: "12.5px",
-                    color: "var(--text-secondary)",
+                    display: "inline-block",
+                    width: "3px",
+                    height: "16px",
+                    background: "var(--accent)",
+                    borderRadius: "2px",
+                    flexShrink: 0,
+                  }}
+                />
+                {children}
+              </h2>
+            ),
+            h3: ({ children }) => (
+              <h3
+                style={{
+                  fontSize: "14.5px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.01em",
+                  color: "var(--text-primary)",
+                  marginTop: "20px",
+                  marginBottom: "8px",
+                }}
+              >
+                {children}
+              </h3>
+            ),
+            p: ({ children }) => (
+              <p
+                style={{
+                  color: "var(--text-secondary)",
+                  lineHeight: 1.8,
+                  marginBottom: "12px",
+                  fontSize: "14px",
+                }}
+              >
+                {children}
+              </p>
+            ),
+            ul: ({ children }) => (
+              <ul
+                style={{
+                  paddingLeft: "0",
+                  listStyle: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  marginBottom: "14px",
+                }}
+              >
+                {children}
+              </ul>
+            ),
+            ol: ({ children }) => (
+              <ol
+                style={{
+                  paddingLeft: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  marginBottom: "14px",
+                  color: "var(--text-secondary)",
+                  fontSize: "14px",
+                }}
+              >
+                {children}
+              </ol>
+            ),
+            li: ({ children }) => (
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "8px",
+                  fontSize: "14px",
+                  color: "var(--text-secondary)",
+                  lineHeight: 1.7,
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "5px",
+                    height: "5px",
+                    borderRadius: "50%",
+                    background: "var(--accent)",
+                    flexShrink: 0,
+                    marginTop: "9px",
+                  }}
+                />
+                <span>{children}</span>
+              </li>
+            ),
+            strong: ({ children }) => (
+              <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                {children}
+              </strong>
+            ),
+            em: ({ children }) => (
+              <em style={{ color: "var(--text-secondary)", fontStyle: "italic" }}>
+                {children}
+              </em>
+            ),
+            blockquote: ({ children }) => (
+              <blockquote
+                style={{
+                  borderLeft: "3px solid var(--accent)",
+                  paddingLeft: "16px",
+                  marginLeft: 0,
+                  marginRight: 0,
+                  marginBottom: "14px",
+                  color: "var(--text-secondary)",
+                  fontSize: "13.5px",
+                  fontStyle: "italic",
+                  background: "var(--accent-subtle)",
+                  padding: "12px 16px",
+                  borderRadius: "0 10px 10px 0",
+                }}
+              >
+                {children}
+              </blockquote>
+            ),
+            code: ({ children, className }) => {
+              const isBlock = className?.startsWith("language-");
+              return isBlock ? (
+                <pre
+                  style={{
+                    background: "var(--surface-2)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "10px",
+                    padding: "14px 16px",
+                    overflow: "auto",
+                    marginBottom: "14px",
+                    fontSize: "13px",
                   }}
                 >
-                  <Icon size={12} strokeWidth={2} />
-                  {text}
-                </div>
-              ))}
-            </div>
-          </div>
-          <span
-            className="badge badge-done"
-            style={{ flexShrink: 0, fontSize: "11px" }}
-          >
-            <Star size={9} strokeWidth={2.5} />
-            92% match
-          </span>
-        </div>
-      </div>
-
-      {/* Flight card */}
-      <div
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "18px 20px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "14px",
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "9px",
-              background: "rgba(99,102,241,0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#818CF8",
-            }}
-          >
-            <Plane size={15} strokeWidth={1.75} />
-          </div>
-          <span
-            style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}
-          >
-            Flights
-          </span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {[
-            { from: "BOM", to: "GOI", time: "06:20 → 07:50", airline: "IndiGo", price: "₹3,200" },
-            { from: "GOI", to: "BOM", time: "19:15 → 20:45", airline: "Air India", price: "₹2,900" },
-          ].map((flight, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px 14px",
-                background: "var(--surface-2)",
-                borderRadius: "12px",
-                gap: "12px",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div>
-                  <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
-                    {flight.from}
-                  </span>
-                  <span style={{ fontSize: "13px", color: "var(--text-muted)", margin: "0 6px" }}>→</span>
-                  <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
-                    {flight.to}
-                  </span>
-                </div>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{flight.time}</span>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{flight.price}</div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{flight.airline}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Hotel card */}
-      <div
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "18px 20px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "14px",
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "9px",
-              background: "rgba(245,158,11,0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--warning)",
-            }}
-          >
-            <Building2 size={15} strokeWidth={1.75} />
-          </div>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-            Accommodation
-          </span>
-        </div>
-
-        <div
-          style={{
-            background: "var(--surface-2)",
-            borderRadius: "12px",
-            padding: "14px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            gap: "12px",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "4px" }}>
-              Nerul Beach Resort
-            </div>
-            <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "8px" }}>
-              North Goa · Beach access · Pool · Breakfast included
-            </div>
-            <div style={{ display: "flex", gap: "4px" }}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star
-                  key={s}
-                  size={11}
-                  fill={s <= 4 ? "var(--warning)" : "transparent"}
-                  color="var(--warning)"
-                  strokeWidth={2}
-                />
-              ))}
-              <span style={{ fontSize: "11px", color: "var(--text-muted)", marginLeft: "4px" }}>4.3 · 312 reviews</span>
-            </div>
-          </div>
-          <div style={{ textAlign: "right", flexShrink: 0 }}>
-            <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>₹6,800</div>
-            <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>2 nights</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Itinerary timeline */}
-      <div
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "18px 20px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "18px",
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "9px",
-              background: "var(--accent-subtle)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--accent-hover)",
-            }}
-          >
-            <Calendar size={15} strokeWidth={1.75} />
-          </div>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-            Day-by-Day Itinerary
-          </span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {days.map((day, i) => (
-            <div
-              key={i}
-              style={{ display: "flex", gap: "14px" }}
-            >
-              <div
-                style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "8px",
-                  background: "var(--accent-subtle)",
-                  border: "1px solid rgba(124,58,237,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "var(--accent-hover)",
-                  flexShrink: 0,
-                }}
-              >
-                {day.day}
-              </div>
-              <div style={{ flex: 1, paddingBottom: i < days.length - 1 ? "12px" : "0", borderBottom: i < days.length - 1 ? "1px solid var(--border)" : "none" }}>
-                <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "6px" }}>
-                  {day.title}
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  {day.activities.map((act) => (
-                    <div
-                      key={act}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12.5px", color: "var(--text-muted)" }}
-                    >
-                      <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "var(--text-muted)", flexShrink: 0 }} />
-                      {act}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Budget breakdown */}
-      <div
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "18px 20px",
-        }}
-      >
-        <div
-          style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "9px",
-              background: "var(--success-subtle)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--success)",
-            }}
-          >
-            <IndianRupee size={15} strokeWidth={1.75} />
-          </div>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-            Budget Breakdown
-          </span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {[
-            { label: "Flights (return)", amount: "₹6,100", pct: 33 },
-            { label: "Accommodation", amount: "₹6,800", pct: 37 },
-            { label: "Food & Dining", amount: "₹2,400", pct: 13 },
-            { label: "Activities & Tours", amount: "₹1,800", pct: 10 },
-            { label: "Transport (local)", amount: "₹1,300", pct: 7 },
-          ].map((item) => (
-            <div key={item.label}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "5px",
-                }}
-              >
-                <span style={{ fontSize: "12.5px", color: "var(--text-secondary)" }}>{item.label}</span>
-                <span style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text-primary)" }}>{item.amount}</span>
-              </div>
-              <div style={{ height: "4px", borderRadius: "999px", background: "var(--surface-el)" }}>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${item.pct}%` }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                  <code style={{ color: "var(--text-primary)", fontFamily: "monospace" }}>
+                    {children}
+                  </code>
+                </pre>
+              ) : (
+                <code
                   style={{
-                    height: "100%",
-                    borderRadius: "999px",
-                    background: "var(--accent)",
-                    opacity: 0.7,
+                    background: "var(--surface-el)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "4px",
+                    padding: "2px 6px",
+                    fontSize: "13px",
+                    fontFamily: "monospace",
+                    color: "var(--accent-hover)",
                   }}
-                />
-              </div>
-            </div>
-          ))}
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "12px 0 0",
-              borderTop: "1px solid var(--border)",
-              marginTop: "4px",
-            }}
-          >
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>Total Estimate</span>
-            <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--success)", letterSpacing: "-0.02em" }}>
-              ₹18,400
-            </span>
-          </div>
-          <p style={{ fontSize: "11px", color: "var(--text-muted)", textAlign: "right" }}>
-            Under ₹20,000 budget · ₹1,600 saved
-          </p>
-        </div>
-      </div>
-
-      {/* Weather */}
-      <div
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "18px 20px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "9px",
-              background: "rgba(251,191,36,0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#FBBF24",
-            }}
-          >
-            <Sun size={15} strokeWidth={1.75} />
-          </div>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-            Weather Forecast
-          </span>
-        </div>
-
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          {["Fri", "Sat", "Sun"].map((day, i) => (
-            <div
-              key={day}
-              style={{
-                flex: "1 1 80px",
-                background: "var(--surface-2)",
-                borderRadius: "12px",
-                padding: "12px",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "6px" }}>{day}</div>
-              <Sun size={18} color="#FBBF24" strokeWidth={1.5} style={{ margin: "0 auto 6px" }} />
-              <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>
-                {30 + i}°C
-              </div>
-              <div style={{ fontSize: "10.5px", color: "var(--text-muted)", marginTop: "2px" }}>Sunny</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Restaurants */}
-      <div
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          borderRadius: "16px",
-          padding: "18px 20px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "9px",
-              background: "rgba(239,68,68,0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--danger)",
-            }}
-          >
-            <Utensils size={15} strokeWidth={1.75} />
-          </div>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-            Top Restaurants
-          </span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {[
-            { name: "Thalassa", cuisine: "Greek · Vagator", rating: "4.6", price: "₹₹₹" },
-            { name: "Infantaria", cuisine: "Continental · Calangute", rating: "4.4", price: "₹₹" },
-            { name: "Fisherman's Wharf", cuisine: "Seafood · Cavelossim", rating: "4.5", price: "₹₹" },
-          ].map((r) => (
-            <div
-              key={r.name}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "10px 12px",
-                background: "var(--surface-2)",
-                borderRadius: "10px",
-                gap: "12px",
-              }}
-            >
-              <div>
-                <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{r.name}</div>
-                <div style={{ fontSize: "11.5px", color: "var(--text-muted)" }}>{r.cuisine}</div>
-              </div>
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
-                <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--warning)" }}>★ {r.rating}</div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{r.price}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+                >
+                  {children}
+                </code>
+              );
+            },
+            hr: () => (
+              <hr
+                style={{
+                  border: "none",
+                  borderTop: "1px solid var(--border)",
+                  margin: "24px 0",
+                }}
+              />
+            ),
+          }}
+        >
+          {content}
+        </ReactMarkdown>
       </div>
     </motion.div>
   );
 }
 
-export function OutputPanel({ loading, hasResult }: OutputPanelProps) {
+// ─── Main OutputPanel ─────────────────────────────────────────────────────────
+
+export function OutputPanel({ loading, hasResult, finalPlan }: OutputPanelProps) {
   return (
     <div
       style={{
@@ -691,33 +468,44 @@ export function OutputPanel({ loading, hasResult }: OutputPanelProps) {
             Travel Plan
           </h3>
           <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px" }}>
-            {loading ? "AI agents are working..." : hasResult ? "Plan ready" : "Awaiting prompt"}
+            {loading ? "AI agents are working..." : hasResult ? "Plan ready · AI-generated" : "Awaiting prompt"}
           </p>
         </div>
-        {loading && (
-          <motion.div
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="badge badge-active"
-            style={{ fontSize: "11px" }}
-          >
-            <div
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "var(--warning)",
-                animation: "pulse-dot 1s ease-in-out infinite",
-              }}
-            />
-            Generating
-          </motion.div>
-        )}
-        {hasResult && !loading && (
-          <span className="badge badge-done" style={{ fontSize: "11px" }}>
-            Complete
-          </span>
-        )}
+        <AnimatePresence mode="wait">
+          {loading && (
+            <motion.div
+              key="loading-badge"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="badge badge-active"
+              style={{ fontSize: "11px" }}
+            >
+              <div
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "var(--warning)",
+                  animation: "pulse-dot 1s ease-in-out infinite",
+                }}
+              />
+              Generating
+            </motion.div>
+          )}
+          {hasResult && !loading && (
+            <motion.span
+              key="done-badge"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="badge badge-done"
+              style={{ fontSize: "11px" }}
+            >
+              Complete
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Content */}
@@ -732,8 +520,8 @@ export function OutputPanel({ loading, hasResult }: OutputPanelProps) {
           >
             <LoadingSkeleton />
           </motion.div>
-        ) : hasResult ? (
-          <TravelResult key="result" />
+        ) : hasResult && finalPlan ? (
+          <MarkdownContent key="result" content={finalPlan} />
         ) : (
           <EmptyState key="empty" />
         )}

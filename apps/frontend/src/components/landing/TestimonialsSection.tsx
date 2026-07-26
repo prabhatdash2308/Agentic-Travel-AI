@@ -4,7 +4,7 @@ import { Star } from "lucide-react";
 
 const TESTIMONIALS = [
   {
-    quote: "Agentic Travel completely reimagined our corporate retreat planning. What used to take our HR team 3 weeks was fully orchestrated in under a minute with zero budget overruns.",
+    quote: "Eagle Agentic AI completely reimagined our corporate retreat planning. What used to take our HR team 3 weeks was fully orchestrated in under a minute with zero budget overruns.",
     name: "Sarah Jenkins",
     role: "VP of People",
     company: "Acme Corp",
@@ -12,7 +12,7 @@ const TESTIMONIALS = [
     color: "linear-gradient(135deg, #f43f5e, #be123c)"
   },
   {
-    quote: "I've tried every AI travel tool. Most just spit out generic ChatGPT lists. Wayfarer is the only one that actually checks live APIs for flights and builds a bookable, cohesive itinerary.",
+    quote: "I've tried every AI travel tool. Most just spit out generic ChatGPT lists. Eagle Agentic AI is the only one that actually checks live APIs for flights and builds a bookable, cohesive itinerary.",
     name: "David Chen",
     role: "Frequent Flyer",
     company: "Nomad Life",

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 
 from app.agent.state import PlannerState
 from app.core import get_logger
@@ -29,7 +29,7 @@ def _prefs_block(state: PlannerState) -> str:
 
 # ── Node 1: Parse intent ──────────────────────────────────────────────────────
 
-async def parse_intent(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def parse_intent(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Extract the core travel intent from the raw user query.
     Identifies: who, where, when, why, what kind of trip.
@@ -52,7 +52,7 @@ async def parse_intent(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict
 
 # ── Node 2: Extract requirements ──────────────────────────────────────────────
 
-async def extract_requirements(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def extract_requirements(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Identify key constraints, must-haves, and potential challenges.
     """
@@ -77,7 +77,7 @@ async def extract_requirements(state: PlannerState, llm: ChatGoogleGenerativeAI)
 
 # ── Node 3: Research destinations ─────────────────────────────────────────────
 
-async def research_destinations(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def research_destinations(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Generate highlights, must-see attractions, and local insights for destinations.
     """
@@ -108,7 +108,7 @@ async def research_destinations(state: PlannerState, llm: ChatGoogleGenerativeAI
 
 # ── Node 4: Draft itinerary ───────────────────────────────────────────────────
 
-async def draft_itinerary(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def draft_itinerary(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Create a structured day-by-day itinerary.
     """
@@ -138,7 +138,7 @@ async def draft_itinerary(state: PlannerState, llm: ChatGoogleGenerativeAI) -> d
 
 # ── Node 5: Estimate costs ────────────────────────────────────────────────────
 
-async def estimate_costs(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def estimate_costs(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Provide a realistic budget breakdown for the trip.
     """
@@ -168,7 +168,7 @@ async def estimate_costs(state: PlannerState, llm: ChatGoogleGenerativeAI) -> di
 
 # ── Node 6: Compile tips ──────────────────────────────────────────────────────
 
-async def compile_tips(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def compile_tips(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Gather practical tips: culture, safety, packing, and local etiquette.
     """
@@ -199,7 +199,7 @@ async def compile_tips(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict
 
 # ── Node 7: Assemble final plan ───────────────────────────────────────────────
 
-async def assemble_plan(state: PlannerState, llm: ChatGoogleGenerativeAI) -> dict:
+async def assemble_plan(state: PlannerState, llm: ChatGroq) -> dict:
     """
     Combine all node outputs into the final polished travel plan document.
     """

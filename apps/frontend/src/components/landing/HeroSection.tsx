@@ -55,18 +55,18 @@ export function HeroSection() {
             >
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--accent)" }} />
               <span className="text-label" style={{ color: "var(--text-primary)" }}>
-                Agentic Travel AI
+                Eagle Agentic AI
               </span>
             </div>
 
             {/* Headline */}
             <h1 className="text-hero" style={{ marginBottom: "24px" }}>
-              The AI Operating System for <span className="gradient-text">Travel.</span>
+              The AI Operating System{" "}<br/><span className="gradient-text">for Travel.</span>
             </h1>
 
             {/* Subtext */}
             <p className="text-body-lg" style={{ color: "var(--text-secondary)", maxWidth: "540px", marginBottom: "48px" }}>
-              Experience luxury travel planning through autonomous AI. Let intelligent agents orchestrate your flights, curate accommodations, and design perfect itineraries with absolute precision.
+              Eagle's autonomous agents orchestrate your flights, curate accommodations, and design perfect itineraries with absolute precision — while you focus on dreaming.
             </p>
 
             {/* CTAs */}

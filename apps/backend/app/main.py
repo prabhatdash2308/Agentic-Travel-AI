@@ -23,7 +23,7 @@ def create_app() -> FastAPI:
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
         description=(
-            "**Agentic Travel AI** — AI-powered travel planning backend.\n\n"
+            "**Eagle Agentic AI** — AI-powered travel planning backend.\n\n"
             "Submit a natural-language travel request and receive a structured "
             "day-by-day itinerary from an autonomous planning agent."
         ),

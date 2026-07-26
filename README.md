@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Eagle Agentic AI
 
 AI Operating System for Travel
@@ -39,3 +40,6 @@ npm install
 npm run dev
 
 uvicorn app.main:app --reload
+=======
+# Eagle Agentic AI
+>>>>>>> 43e0bfa (feat: launch Eagle Agentic AI v1.0)

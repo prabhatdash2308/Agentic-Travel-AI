@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Map, Calendar, Plane, Hotel, CheckCircle2, Activity, Wallet, CloudRain, Bell, Search, Settings } from "lucide-react";
+import { Map, Plane, Hotel, CheckCircle2, Activity, Wallet, CloudRain, Bell, Search, Settings } from "lucide-react";
 
 export function DashboardSection() {
   const ref = useRef<HTMLDivElement>(null);

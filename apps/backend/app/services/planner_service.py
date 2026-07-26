@@ -4,7 +4,7 @@ import asyncio
 import uuid
 from datetime import datetime, timezone
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.graph import build_planner_graph
@@ -22,11 +22,11 @@ from app.schemas.workflow import (
 logger = get_logger(__name__)
 
 
-def _build_llm() -> ChatGoogleGenerativeAI:
-    return ChatGoogleGenerativeAI(
-        model=settings.GEMINI_MODEL,
+def _build_llm() -> ChatGroq:
+    return ChatGroq(
+        model=settings.GROQ_MODEL,
         temperature=settings.LLM_TEMPERATURE,
-        google_api_key=settings.GOOGLE_API_KEY,
+        groq_api_key=settings.GROQ_API_KEY,
     )
 
 
@@ -45,12 +45,12 @@ class PlannerService:
         if settings.llm_configured:
             self._llm = _build_llm()
             self._graph = build_planner_graph(self._llm)
-            logger.info("LLM configured | model=%s", settings.GEMINI_MODEL)
+            logger.info("LLM configured | model=%s", settings.GROQ_MODEL)
         else:
             self._llm = None
             self._graph = None
             logger.warning(
-                "GOOGLE_API_KEY not set — LLM pipeline disabled. "
+                "GROQ_API_KEY not set — LLM pipeline disabled. "
                 "Workflows will stay in PENDING state."
             )
 
@@ -144,7 +144,7 @@ class PlannerService:
                 await repo.update_status(
                     workflow_id,
                     status=WorkflowStatus.FAILED,
-                    error_message="GOOGLE_API_KEY not configured. Set it in .env to enable AI planning.",
+                    error_message="GROQ_API_KEY not configured. Set it in .env to enable AI planning.",
                 )
                 await db.commit()
                 logger.warning("Agent pipeline skipped (LLM not configured) | id=%s", workflow_id)

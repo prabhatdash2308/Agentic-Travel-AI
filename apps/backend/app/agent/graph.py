@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import partial
 
 from langgraph.graph import StateGraph, START, END
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 
 from app.agent.state import PlannerState
 from app.agent.nodes import (
@@ -20,7 +20,7 @@ from app.core import get_logger
 logger = get_logger(__name__)
 
 
-def build_planner_graph(llm: ChatGoogleGenerativeAI) -> StateGraph:
+def build_planner_graph(llm: ChatGroq) -> StateGraph:
     """
     Construct and compile the LangGraph travel planner pipeline.
 

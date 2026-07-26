@@ -34,7 +34,7 @@ export function WorkflowSection() {
             <span style={{ color: "var(--text-muted)" }}>working in parallel.</span>
           </h2>
           <p className="text-body-lg text-secondary" style={{ maxWidth: "600px", margin: "0 auto" }}>
-            Instead of a single slow model, Wayfarer deploys micro-agents that simultaneously query APIs, compare prices, and optimize routes.
+            Instead of a single slow model, Eagle Agentic AI deploys micro-agents that simultaneously query APIs, compare prices, and optimize routes.
           </p>
         </motion.div>
 
