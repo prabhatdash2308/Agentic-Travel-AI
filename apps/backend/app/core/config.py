@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
-from typing import Literal
+from typing import Literal, ClassVar
 
 
 class Settings(BaseSettings):
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     )
 
     # CORS — allow both CRA (3000) and Vite (5173) dev servers
-    ALLOWED_ORIGINS = [
+    ALLOWED_ORIGINS: ClassVar[list[str]] = [
         "https://agentic-travel-ai.vercel.app",
         "https://agentic-travel-42cuuabqv-prabhatdash2308-9066s-projects.vercel.app",
         "http://localhost:5173",
