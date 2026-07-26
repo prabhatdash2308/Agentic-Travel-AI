@@ -1,23 +1,16 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/preserve-manual-memoization */
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Search,
-  Zap,
-  Clock,
-  BookOpen,
-  DollarSign,
-  Info,
-  LogIn,
-  Moon,
-  Sun,
-  Home,
   ArrowRight,
   Command,
 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+import { createCommands } from "../../utils/commands";
 
-interface CommandItem {
+export interface CommandItem {
   id: string;
   label: string;
   description?: string;
@@ -47,78 +40,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     [navigate, onClose]
   );
 
-  const ALL_COMMANDS: CommandItem[] = [
-    {
-      id: "workspace",
-      label: "Open Workspace",
-      description: "Start planning a new trip",
-      icon: Zap,
-      action: () => go("/workspace"),
-      group: "Navigation",
-      shortcut: "W",
-    },
-    {
-      id: "history",
-      label: "View History",
-      description: "Browse your past travel plans",
-      icon: Clock,
-      action: () => go("/history"),
-      group: "Navigation",
-      shortcut: "H",
-    },
-    {
-      id: "home",
-      label: "Go Home",
-      description: "Return to landing page",
-      icon: Home,
-      action: () => go("/"),
-      group: "Navigation",
-    },
-    {
-      id: "docs",
-      label: "Documentation",
-      description: "Architecture, agents, API reference",
-      icon: BookOpen,
-      action: () => go("/docs"),
-      group: "Navigation",
-    },
-    {
-      id: "pricing",
-      label: "Pricing",
-      description: "Plans and billing",
-      icon: DollarSign,
-      action: () => go("/pricing"),
-      group: "Navigation",
-    },
-    {
-      id: "about",
-      label: "About Eagle",
-      description: "Mission, team, roadmap",
-      icon: Info,
-      action: () => go("/about"),
-      group: "Navigation",
-    },
-    {
-      id: "signin",
-      label: "Sign In",
-      description: "Access your account",
-      icon: LogIn,
-      action: () => go("/login"),
-      group: "Account",
-    },
-    {
-      id: "theme",
-      label: resolvedTheme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode",
-      description: "Toggle color scheme",
-      icon: resolvedTheme === "dark" ? Sun : Moon,
-      action: () => {
-        toggleTheme();
-        onClose();
-      },
-      group: "Preferences",
-      shortcut: "T",
-    },
-  ];
+  const ALL_COMMANDS = useMemo(
+    () => createCommands(go, resolvedTheme, toggleTheme, onClose),
+    [go, resolvedTheme, toggleTheme, onClose]
+  );
 
   const filtered = query.trim()
     ? ALL_COMMANDS.filter(
@@ -137,6 +62,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   // Flat list for keyboard navigation
   const flatItems = Object.values(groups).flat();
 
+  // Reset state when palette opens/closes
   useEffect(() => {
     if (open) {
       setQuery("");
@@ -145,6 +71,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     }
   }, [open]);
 
+  // Reset active index when query changes
   useEffect(() => {
     setActiveIdx(0);
   }, [query]);
@@ -166,7 +93,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         flatItems[activeIdx]?.action();
       }
     },
-    [open, flatItems, activeIdx, onClose]
+    [open, onClose, flatItems, activeIdx]
   );
 
   useEffect(() => {

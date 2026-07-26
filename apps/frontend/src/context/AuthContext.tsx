@@ -1,11 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+import { loadUserFromStorage, saveUserToStorage, removeUserFromStorage } from "../utils/auth";
+import type { User } from "./AuthContext.types";
 
 interface AuthContextValue {
   user: User | null;
@@ -16,17 +12,8 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STORAGE_KEY = "eagle-user";
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? (JSON.parse(stored) as User) : null;
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState<User | null>(() => loadUserFromStorage());
 
   const signIn = useCallback((email: string, name?: string) => {
     const newUser: User = {
@@ -34,12 +21,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       name: name ?? email.split("@")[0],
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
+    saveUserToStorage(newUser);
     setUser(newUser);
   }, []);
 
   const signOut = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    removeUserFromStorage();
     setUser(null);
   }, []);
 

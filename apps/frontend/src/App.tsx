@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { LandingPage } from "./pages/LandingPage";
-import { WorkspacePage } from "./pages/WorkspacePage";
-import { SignInPage } from "./pages/auth/SignInPage";
-import { CreateAccountPage } from "./pages/auth/CreateAccountPage";
-import { HistoryPage } from "./pages/HistoryPage";
-import { DocsPage } from "./pages/DocsPage";
-import { PricingPage } from "./pages/PricingPage";
-import { AboutPage } from "./pages/AboutPage";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { CommandPalette } from "./components/ui/CommandPalette";
-import { useState, useEffect } from "react";
+
+const LandingPage = lazy(() => import("./pages/LandingPage").then(m => ({ default: m.LandingPage })));
+const WorkspacePage = lazy(() => import("./pages/WorkspacePage").then(m => ({ default: m.WorkspacePage })));
+const SignInPage = lazy(() => import("./pages/auth/SignInPage").then(m => ({ default: m.SignInPage })));
+const CreateAccountPage = lazy(() => import("./pages/auth/CreateAccountPage").then(m => ({ default: m.CreateAccountPage })));
+const HistoryPage = lazy(() => import("./pages/HistoryPage").then(m => ({ default: m.HistoryPage })));
+const DocsPage = lazy(() => import("./pages/DocsPage").then(m => ({ default: m.DocsPage })));
+const PricingPage = lazy(() => import("./pages/PricingPage").then(m => ({ default: m.PricingPage })));
+const AboutPage = lazy(() => import("./pages/AboutPage").then(m => ({ default: m.AboutPage })));
 
 // Wrapper to provide useNavigate to WorkspacePage
 function WorkspacePageWrapper() {
@@ -36,16 +37,29 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<SignInPage />} />
-        <Route path="/register" element={<CreateAccountPage />} />
-        <Route path="/workspace" element={<WorkspacePageWrapper />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/docs" element={<DocsPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/about" element={<AboutPage />} />
-      </Routes>
+      <Suspense fallback={
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          minHeight: '100vh',
+          background: 'var(--bg)',
+          color: 'var(--text-muted)'
+        }}>
+          Loading...
+        </div>
+      }>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<SignInPage />} />
+          <Route path="/register" element={<CreateAccountPage />} />
+          <Route path="/workspace" element={<WorkspacePageWrapper />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Routes>
+      </Suspense>
       <CommandPalette open={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} />
     </BrowserRouter>
   );

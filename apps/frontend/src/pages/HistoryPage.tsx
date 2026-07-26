@@ -3,20 +3,7 @@ import { motion } from "framer-motion";
 import { Clock, Search, Trash2, Copy } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { useToast } from "../context/ToastContext";
-
-interface Trip {
-  id: string;
-  destination: string;
-  date: string;
-  budget: string;
-  status: "completed" | "draft";
-}
-
-const MOCK_TRIPS: Trip[] = [
-  { id: "1", destination: "Japan - Tokyo & Kyoto", date: "2024-03-15", budget: "₹1,50,000", status: "completed" },
-  { id: "2", destination: "Goa Weekend", date: "2024-02-20", budget: "₹25,000", status: "completed" },
-  { id: "3", destination: "Europe Backpacking", date: "2024-06-01", budget: "₹3,00,000", status: "draft" },
-];
+import { MOCK_TRIPS, type Trip } from "../data/mockTrips";
 
 export function HistoryPage() {
   const [trips] = useState<Trip[]>(MOCK_TRIPS);
@@ -31,7 +18,7 @@ export function HistoryPage() {
     success("Copied", `Itinerary for ${trip.destination} copied to clipboard`);
   };
 
-  const handleDelete = (_tripId: string) => {
+  const handleDelete = () => {
     info("Deleted", "Trip moved to trash");
   };
 
@@ -141,7 +128,7 @@ export function HistoryPage() {
                       <Copy size={15} />
                     </button>
                     <button
-                      onClick={() => handleDelete(trip.id)}
+                      onClick={() => handleDelete()}
                       className="btn-icon"
                       style={{ width: "36px", height: "36px", padding: "8px", color: "var(--danger)" }}
                       aria-label="Delete trip"

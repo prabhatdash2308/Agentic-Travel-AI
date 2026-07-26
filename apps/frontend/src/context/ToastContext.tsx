@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
   useContext,
@@ -7,17 +8,9 @@ import {
   type ReactNode,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, XCircle, Info, AlertTriangle, X } from "lucide-react";
-
-export type ToastType = "success" | "error" | "info" | "warning";
-
-export interface Toast {
-  id: string;
-  type: ToastType;
-  title: string;
-  description?: string;
-  duration?: number;
-}
+import { X } from "lucide-react";
+import { ICON_MAP, COLOR_MAP, generateToastId } from "../utils/toast";
+import type { Toast } from "./ToastContext.types";
 
 interface ToastContextValue {
   toasts: Toast[];
@@ -31,22 +24,6 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-const ICON_MAP: Record<ToastType, React.ElementType> = {
-  success: CheckCircle2,
-  error: XCircle,
-  info: Info,
-  warning: AlertTriangle,
-};
-
-const COLOR_MAP: Record<ToastType, string> = {
-  success: "var(--success)",
-  error: "var(--danger)",
-  info: "var(--info)",
-  warning: "var(--warning)",
-};
-
-let counter = 0;
-
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -59,7 +36,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const toast = useCallback(
     (opts: Omit<Toast, "id">) => {
-      const id = `toast-${++counter}`;
+      const id = generateToastId();
       const duration = opts.duration ?? 4000;
       setToasts((prev) => [...prev.slice(-4), { ...opts, id }]);
       const timer = setTimeout(() => dismiss(id), duration);
